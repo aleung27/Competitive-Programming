@@ -22,11 +22,11 @@ int main () {
     int p, t, raise, lower;
     scanf("%d %d %d %d", &p, &raise, &t, &lower);
 
-    if(p > t) {
+    if(p >= t) {
         printf("%d\n", p);
         return 0;
     }
-    
+
     while(t-p > raise+lower) {
         p += raise;
         t -= lower;

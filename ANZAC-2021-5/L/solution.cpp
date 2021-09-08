@@ -36,24 +36,13 @@ T modpow(T x, T n, T m) {
     return u;
 }
 
-int total = 0;
+int onebits(int a) {
+    int ones = 0;
+    for (int i = 0; (1 << i) <= a; i++) {
+        if ((1 << i) & a) ones++;
+    }
 
-void dfs(int at, string& w, int index, vector<set<char>>& capitals,
-         vector<bool> seen) {
-    seen[at] = true;
-
-    if (capitals[at].count(w[index])) {
-        if (index == w.length() - 1) {
-            total++;
-            return;
-        }
-
-        for (int i = 0; i < capitals.size(); i++) {
-            if (!seen.at(i) && capitals[i].count(w[index + 1]))
-                dfs(i, w, index + 1, capitals, seen);
-        }
-    } else
-        return;
+    return ones;
 }
 
 int main() {
@@ -78,49 +67,30 @@ int main() {
     for (int i = 0; i < w; i++) {
         string word;
         cin >> word;
-        total = 0;
 
         if (word.length() != n) {
             cout << "0" << endl;
             continue;
         }
-        for (int j = 0; j < word.length(); j++)
-            dfs(j, word, 0, capitals, vector<bool>(10, false));
 
-        // int dp[n][word.length()];
-        // for (int j = 0; j < word.length(); j++) {
-        //     for (int i = 0; i < n; i++) {
-        //         if (capitals[i].count(word[j])) {
-        //             if (j) {
-        //                 int sum = 0;
-        //                 for (int k = 0; k < n; k++) {
-        //                     if (k == i) continue;
-        //                     sum += dp[k][j - 1];
-        //                 }
-        //                 dp[i][j] = sum;
-        //             } else {
-        //                 dp[i][j] = 1;
-        //             }
-        //         } else {
-        //             dp[i][j] = 0;
-        //         }
-        //     }
-        // }
+        int dp[1 << n];
+        dp[0] = 1;
 
-        // for (int i = 0; i < n; i++) {
-        //     for (int j = 0; j < word.length(); j++) {
-        //         cout << dp[i][j] << " ";
-        //     }
-        //     cout << endl;
-        // }
+        for (int i = 1; i < 1 << n; i++) {
+            dp[i] = 0;
+            int ones = onebits(i);
+            // cout << ones << endl;
 
-        // int ans = 0;
-        // for (int i = 0; i < n; i++) {
-        //     ans = max(ans, dp[i][word.length() - 1]);
-        // }
-        // cout << ans << endl;
+            for (int bit = 0; bit < n; bit++) {
+                if ((1 << bit) & i && capitals[bit].count(word[ones - 1])) {
+                    dp[i] += dp[(1 << bit) ^ i];
+                }
+            }
 
-        cout << total << endl;
+            // cout << dp[i] << endl;
+        }
+
+        cout << dp[(1 << n) - 1] << endl;
     }
 
     return 0;
